@@ -3,6 +3,40 @@ class TodoList {
     this.todoTasks = [];
     this.inProgressTasks = [];
     this.finishedTasks = [];
+    this.draggedTask = null;
+    this.draggedFrom = null;
+  }
+
+  enableDragAndDrop() {
+    const columns = document.querySelectorAll(".column");
+    const trashBin = document.getElementById("trash");
+
+    columns.forEach((column) => {
+      column.addEventListener("dragover", (event) => {
+        event.preventDefault();
+      });
+
+      column.addEventListener("drop", (event) => {
+        event.preventDefault();
+        const columnId = event.target.id;
+        this.moveTaskToColumn(columnId);
+      });
+    });
+
+    trashBin.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      trashBin.classList.add("dragover");
+    });
+
+    trashBin.addEventListener("dragleave", () => {
+      trashBin.classList.remove("dragover");
+    });
+
+    trashBin.addEventListener("drop", (event) => {
+      event.preventDefault();
+      trashBin.classList.remove("dragover");
+      this.deleteDraggedTask();
+    });
   }
 
   getCurrentTime() {
@@ -20,7 +54,6 @@ class TodoList {
       finishedAt: null,
     });
     this.displayTasks();
-    console.log(`Task "${task.title}" added.`);
   }
 
   deleteTask(list, index) {
@@ -28,18 +61,54 @@ class TodoList {
     this.displayTasks();
   }
 
-  moveToInProgress(index) {
-    const task = this.todoTasks.splice(index, 1)[0];
-    this.inProgressTasks.push(task);
+  deleteDraggedTask() {
+    if (this.draggedTask && this.draggedFrom) {
+      const index = this.draggedFrom.indexOf(this.draggedTask);
+      if (index > -1) {
+        this.draggedFrom.splice(index, 1);
+        this.displayTasks();
+      }
+      this.draggedTask = null;
+      this.draggedFrom = null;
+    }
+  }
+
+  moveTaskToColumn(columnId) {
+    const task = this.draggedTask;
+
+    this.draggedFrom.splice(this.draggedFrom.indexOf(task), 1);
+
+    if (columnId === "todoList") {
+      this.todoTasks.push(task);
+    } else if (columnId === "inProgressList") {
+      this.inProgressTasks.push(task);
+    } else if (columnId === "finishedList") {
+      task.completed = true;
+      task.finishedAt = this.getCurrentTime();
+      this.finishedTasks.push(task);
+    }
+
     this.displayTasks();
   }
 
-  moveToFinished(index) {
-    const task = this.inProgressTasks.splice(index, 1)[0];
-    task.completed = true;
-    task.finishedAt = this.getCurrentTime();
-    this.finishedTasks.push(task);
-    this.displayTasks();
+  makeDraggableEditable(taskItem, task, list) {
+    taskItem.draggable = true;
+    taskItem.addEventListener("dragstart", () => {
+      this.draggedTask = task;
+      this.draggedFrom = list;
+    });
+
+    const title = taskItem.querySelector(".task-title");
+    const description = taskItem.querySelector(".task-description");
+    title.contentEditable = true;
+    description.contentEditable = true;
+
+    title.addEventListener("blur", () => {
+      task.title = title.innerText;
+    });
+    description.addEventListener("blur", () => {
+      task.description = description.innerText;
+    });
   }
 
   displayTasks() {
@@ -68,52 +137,22 @@ class TodoList {
       }
     };
 
-    const makeEditable = (taskItem, task, list, index) => {
-      const span = taskItem.querySelector("span");
-      const originalText = span.innerText;
-      const input = document.createElement("input");
-      input.type = "text";
-      input.value = originalText;
-      input.className = "edit-input";
-
-      span.replaceWith(input);
-      input.focus();
-
-      const saveChanges = () => {
-        task.description = input.value;
-        this.displayTasks();
-      };
-
-      input.addEventListener("blur", saveChanges);
-      input.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          saveChanges();
-        }
-      });
-    };
-
     this.todoTasks.forEach((task, index) => {
       const taskItem = document.createElement("li");
       taskItem.className = getImportanceClass(task.importance);
-      taskItem.innerHTML = `<span>${task.title} - ${task.description} <div>Créée le : ${task.createdAt}</div></span>`;
-
-      const inProgressButton = document.createElement("button");
-      inProgressButton.innerText = "📌​";
-      inProgressButton.onclick = () => this.moveToInProgress(index);
+      taskItem.innerHTML = `
+          <span class="task-title">${task.title}</span> - 
+          <span class="task-description">${task.description}</span>
+          <div>Créée le : ${task.createdAt}</div>
+        `;
 
       const deleteButton = document.createElement("button");
       deleteButton.innerText = "❌";
       deleteButton.onclick = () => this.deleteTask(this.todoTasks, index);
 
-      const editButton = document.createElement("button");
-      editButton.innerText = "✏️​";
-      editButton.className = "edit-button";
-      editButton.onclick = () =>
-        makeEditable(taskItem, task, this.todoTasks, index);
-
-      taskItem.appendChild(editButton);
-      taskItem.appendChild(inProgressButton);
       taskItem.appendChild(deleteButton);
+
+      this.makeDraggableEditable(taskItem, task, this.todoTasks);
 
       todoList.appendChild(taskItem);
     });
@@ -121,25 +160,19 @@ class TodoList {
     this.inProgressTasks.forEach((task, index) => {
       const taskItem = document.createElement("li");
       taskItem.className = getImportanceClass(task.importance);
-      taskItem.innerHTML = `<span>${task.title} - ${task.description}<div>Créée le : ${task.createdAt}</div></span>`;
-
-      const finishButton = document.createElement("button");
-      finishButton.innerText = "✅";
-      finishButton.onclick = () => this.moveToFinished(index);
+      taskItem.innerHTML = `
+          <span class="task-title">${task.title}</span> - 
+          <span class="task-description">${task.description}</span>
+          <div>Créée le : ${task.createdAt}</div>
+        `;
 
       const deleteButton = document.createElement("button");
       deleteButton.innerText = "❌";
       deleteButton.onclick = () => this.deleteTask(this.inProgressTasks, index);
 
-      const editButton = document.createElement("button");
-      editButton.innerText = "✏️";
-      editButton.className = "edit-button";
-      editButton.onclick = () =>
-        makeEditable(taskItem, task, this.inProgressTasks, index);
-
-      taskItem.appendChild(editButton);
-      taskItem.appendChild(finishButton);
       taskItem.appendChild(deleteButton);
+
+      this.makeDraggableEditable(taskItem, task, this.inProgressTasks);
 
       inProgressList.appendChild(taskItem);
     });
@@ -147,13 +180,19 @@ class TodoList {
     this.finishedTasks.forEach((task, index) => {
       const taskItem = document.createElement("li");
       taskItem.className = `completed ${getImportanceClass(task.importance)}`;
-      taskItem.innerHTML = `<span>${task.title} - ${task.description} <div>Créée le : ${task.createdAt}</div>Terminée le : ${task.finishedAt}</span>`;
+      taskItem.innerHTML = `
+          <span class="task-title">${task.title}</span> - 
+          <span class="task-description">${task.description}</span>
+          <div>Créée le : ${task.createdAt}</div>
+          <div>Terminée le : ${task.finishedAt}</div>
+        `;
 
       const deleteButton = document.createElement("button");
       deleteButton.innerText = "❌";
       deleteButton.onclick = () => this.deleteTask(this.finishedTasks, index);
 
       taskItem.appendChild(deleteButton);
+      this.makeDraggableEditable(taskItem, task, this.finishedTasks);
 
       finishedList.appendChild(taskItem);
     });
@@ -161,6 +200,7 @@ class TodoList {
 }
 
 const myTodoList = new TodoList();
+myTodoList.enableDragAndDrop();
 
 document
   .getElementById("todoForm")

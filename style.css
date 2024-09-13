@@ -249,3 +249,23 @@ li span {
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
 }
+
+.trash-bin {
+  width: 100px;
+  height: 100px;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+.trash-bin.dragover {
+  background-color: #e53935;
+}
