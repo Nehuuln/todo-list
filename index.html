@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ma To-Do List</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>To-Do List</h1>
+
+    <button id="openFormButton">Créer une tâche</button>
+    <form id="todoForm">
+      <input
+        type="text"
+        id="taskTitle"
+        placeholder="Titre de la tâche"
+        required
+      />
+      <input
+        type="text"
+        id="taskDescription"
+        placeholder="Description de la tâche"
+        required
+      />
+      <select id="taskImportance" required>
+        <option value="Low">Faible</option>
+        <option value="Medium">Moyenne</option>
+        <option value="High">Élevée</option>
+      </select>
+      <button type="submit" id="closeFormButton">Créer une tâche</button>
+    </form>
+
+    <div class="task-columns">
+      <div
+        class="column"
+        id="todoList"
+        ondrop="drop(event)"
+        ondragover="allowDrop(event)"
+      >
+        <h2>TO DO</h2>
+      </div>
+      <div
+        class="column"
+        id="inProgressList"
+        ondrop="drop(event)"
+        ondragover="allowDrop(event)"
+      >
+        <h2>EN COURS</h2>
+      </div>
+      <div
+        class="column"
+        id="finishedList"
+        ondrop="drop(event)"
+        ondragover="allowDrop(event)"
+      >
+        <h2>FINIE</h2>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
