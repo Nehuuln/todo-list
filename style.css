@@ -267,5 +267,9 @@ li span {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 .trash-bin.dragover {
-  background-color: #e53935;
+  background-color: transparent;
+  background-image: url("https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTZhd3BqbnY3d2gyMDhxZzZzOTJhODRiN2I0YXlxenV2YTFndDZsdyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/SRrbiFCfEzFPaKsXMA/giphy.gif");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
