@@ -223,7 +223,7 @@ document
     if (myTodoList.isDuplicateTaskTitle(taskTitle)) {
       errorMessage.textContent =
         "Erreur : Une tâche avec ce titre existe déjà.";
-      errorMessage.style.display = "block"; // Affiche le message d'erreur
+      errorMessage.style.display = "block";
     } else {
       errorMessage.style.display = "none";
 
