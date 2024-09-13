@@ -56,11 +56,6 @@ class TodoList {
     this.displayTasks();
   }
 
-  deleteTask(list, index) {
-    list.splice(index, 1);
-    this.displayTasks();
-  }
-
   deleteDraggedTask() {
     if (this.draggedTask && this.draggedFrom) {
       const index = this.draggedFrom.indexOf(this.draggedTask);
@@ -145,7 +140,7 @@ class TodoList {
       }
     };
 
-    this.todoTasks.forEach((task, index) => {
+    this.todoTasks.forEach((task) => {
       const taskItem = document.createElement("li");
       taskItem.className = getImportanceClass(task.importance);
       taskItem.innerHTML = `
@@ -153,19 +148,13 @@ class TodoList {
           <span class="task-description">${task.description}</span>
           <div>Créée le : ${task.createdAt}</div>
         `;
-
-      const deleteButton = document.createElement("button");
-      deleteButton.innerText = "❌";
-      deleteButton.onclick = () => this.deleteTask(this.todoTasks, index);
-
-      taskItem.appendChild(deleteButton);
 
       this.makeDraggableEditable(taskItem, task, this.todoTasks);
 
       todoList.appendChild(taskItem);
     });
 
-    this.inProgressTasks.forEach((task, index) => {
+    this.inProgressTasks.forEach((task) => {
       const taskItem = document.createElement("li");
       taskItem.className = getImportanceClass(task.importance);
       taskItem.innerHTML = `
@@ -174,18 +163,12 @@ class TodoList {
           <div>Créée le : ${task.createdAt}</div>
         `;
 
-      const deleteButton = document.createElement("button");
-      deleteButton.innerText = "❌";
-      deleteButton.onclick = () => this.deleteTask(this.inProgressTasks, index);
-
-      taskItem.appendChild(deleteButton);
-
       this.makeDraggableEditable(taskItem, task, this.inProgressTasks);
 
       inProgressList.appendChild(taskItem);
     });
 
-    this.finishedTasks.forEach((task, index) => {
+    this.finishedTasks.forEach((task) => {
       const taskItem = document.createElement("li");
       taskItem.className = `completed ${getImportanceClass(task.importance)}`;
       taskItem.innerHTML = `
@@ -195,11 +178,6 @@ class TodoList {
           <div>Terminée le : ${task.finishedAt}</div>
         `;
 
-      const deleteButton = document.createElement("button");
-      deleteButton.innerText = "❌";
-      deleteButton.onclick = () => this.deleteTask(this.finishedTasks, index);
-
-      taskItem.appendChild(deleteButton);
       this.makeDraggableEditable(taskItem, task, this.finishedTasks);
 
       finishedList.appendChild(taskItem);
