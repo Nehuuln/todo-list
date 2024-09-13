@@ -111,6 +111,14 @@ class TodoList {
     });
   }
 
+  isDuplicateTaskTitle(title) {
+    return (
+      this.todoTasks.some((task) => task.title === title) ||
+      this.inProgressTasks.some((task) => task.title === title) ||
+      this.finishedTasks.some((task) => task.title === title)
+    );
+  }
+
   displayTasks() {
     const todoList = document.getElementById("todoList");
     const inProgressList = document.getElementById("inProgressList");
@@ -210,17 +218,26 @@ document
     const taskTitle = document.getElementById("taskTitle").value;
     const taskDescription = document.getElementById("taskDescription").value;
     const taskImportance = document.getElementById("taskImportance").value;
+    const errorMessage = document.getElementById("errorMessage");
 
-    if (taskTitle && taskDescription) {
-      myTodoList.addTask({
-        title: taskTitle,
-        description: taskDescription,
-        importance: taskImportance,
-      });
+    if (myTodoList.isDuplicateTaskTitle(taskTitle)) {
+      errorMessage.textContent =
+        "Erreur : Une tâche avec ce titre existe déjà.";
+      errorMessage.style.display = "block"; // Affiche le message d'erreur
+    } else {
+      errorMessage.style.display = "none";
 
-      document.getElementById("taskTitle").value = "";
-      document.getElementById("taskDescription").value = "";
-      document.getElementById("taskImportance").value = "Low";
+      if (taskTitle && taskDescription) {
+        myTodoList.addTask({
+          title: taskTitle,
+          description: taskDescription,
+          importance: taskImportance,
+        });
+
+        document.getElementById("taskTitle").value = "";
+        document.getElementById("taskDescription").value = "";
+        document.getElementById("taskImportance").value = "Low";
+      }
     }
   });
 
